@@ -4,9 +4,11 @@ import imaplib
 import email
 from datetime import datetime
 import openai
-import re
+import logging
 
-#mail_subject = "Update zum neuen Büro Interior"
+# set logging level
+logging.basicConfig(level=logging.WARNING)
+
 mail_subject = "Update zum neuen"
 
 # this programs reads amail threads and lets them analyse by openAI
@@ -17,8 +19,8 @@ def main():
     user = os.environ.get('MAIL_USER')
     server = os.environ.get('MAIL_SERVER')
     openai_token = os.environ.get('OPENAI_TOKEN')
-    print(f'User: {user}')
-    print(f'Server: {server}')
+    logging.info(f'User: {user}')
+    logging.info(f'Server: {server}')
 
     # connect to mail server
     mail = check_login(user, secret, server)
@@ -26,11 +28,11 @@ def main():
         return
     
     # Use the list method to get the mailboxes
-    print("Mailboxes:")
+    logging.info("Mailboxes:")
     status, mailbox_list = mail.list()
     if status == 'OK':
         for mailbox in mailbox_list:
-            print(mailbox)
+            logging.info(mailbox)
 
     # select inbox
     mail.select("INBOX")
@@ -47,7 +49,7 @@ def main():
     # Now, emails are sorted by date in ascending order.
     # You can access the email data like this:
     for email_data in emails:
-        print(f"Email ID: {email_data['email_id']}, Date: {email_data['date']}, Subject: {email_data['sender']}")
+        print(f"Email ID: {email_data['email_id']}, Date: {email_data['date']}, From: {email_data['sender']}")
 
     # close connection
     mail.close()
@@ -59,9 +61,8 @@ def main():
         openai_query += process_mail(email)
         openai_query += "\n\n"
     
-    # send query to openAI and ask for a summary
+    # send query to openAI 
     openai.api_key = openai_token
-    # Sending the entire conversation as the prompt
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -73,7 +74,7 @@ def main():
     )
 
     # Output the AI's response
-    print("\n\n---------------")
+    print("\n---------------\nAI Response:\n---------------\n")
     print(response["choices"][0]["message"]["content"])
 
 # parse emails to get sender, content, etc and return result as list
@@ -157,12 +158,12 @@ def check_login(username, password, server):
         mail.login(username, password)
         
         # If successful, print a message and return the mail object
-        print(f"Login successful for {username}")
+        logging.info(f"Login successful for {username}")
         return mail
 
     except imaplib.IMAP4.error as e:
         # If login fails, print a message and return None
-        print(f"Login failed for {username}: {str(e)}")
+        logging.error(f"Login failed for {username}: {str(e)}")
         return None
     
 
