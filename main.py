@@ -47,7 +47,7 @@ def main():
 
     # parse mails
     emails = parse_mails(mail, email_ids)
-    emails.sort(key=lambda email: email['date'])
+    # emails.sort(key=lambda email: email['date'])
 
     # Now, emails are sorted by date in ascending order.
     # You can access the email data like this:
@@ -97,7 +97,13 @@ def parse_mails(mail, email_ids):
         # Extract email date, subject, sender, and content
         date = message.get('date')
         date = date.replace(' (UTC)', '')
-        date_parsed = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %z')
+        date = date.replace(' (CEST)', '')
+        date_parsed = None
+        try:
+            date_parsed = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %z')
+        except ValueError:
+            logging.error(f"Failed to parse date {date}")
+            date_parsed = ''
         subject = message.get('subject')
         sender = message.get('from')
         
