@@ -74,7 +74,7 @@ def main():
     )
 
     # Output the AI's response
-    print("\n---------------\nAI Response:\n---------------\n")
+    print("\n-----------\nAI Response\n-----------\n")
     print(response["choices"][0]["message"]["content"])
 
 # parse emails to get sender, content, etc and return result as list
@@ -129,10 +129,10 @@ def decode_string(content):
     for encoding in encoding_types:
         try:
             decoded_text = content.decode(encoding)
-            print(f"Successfully decoded using {encoding}")
+            logging.info(f"Successfully decoded using {encoding}")
             return decoded_text
         except UnicodeDecodeError:
-            print(f"Failed to decode using {encoding}")
+            logging.info(f"Failed to decode using {encoding}")
             continue
     return ""
 
