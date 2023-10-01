@@ -61,22 +61,24 @@ def main():
         # send query to openAI and ask for a summary
         openai.api_key = openai_token
         # Sending the entire conversation as the prompt
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo",
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
-                    f"content": "[{openai_query}]"
+                    "content": "This is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly."
                 },
                 {
                     "role": "user",
-                    "content": "Summarize the mail."
+                    'content': f'Summarize this mail: \n\n {openai_query}'
                 }
             ]
         )
 
         # Output the AI's response
-        print(response.choices[0].text.strip())
+        print("mail summary:")
+        print(response["choices"][0]["message"]["content"])
+        print("---------------\n\n") 
 
 # parse emails to get sender, content, etc and return result as list
 def parse_mails(mail, email_ids):
