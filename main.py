@@ -105,10 +105,7 @@ def parse_mails(mail, email_ids):
                 # If text/plain or text/html, get the payload
                 if part.get_content_type() == 'text/plain' or part.get_content_type() == 'text/html':
                     content = part.get_payload(decode=True)
-                    try:
-                        content_str = content.decode('utf-8')
-                    except UnicodeDecodeError:
-                        content_str = ""
+                    content_str = decode_string(content)
                     break
         else:
             # If not multipart, directly get the payload
@@ -129,16 +126,28 @@ def parse_mails(mail, email_ids):
 
     return emails
 
+# Try to decode a byte string using different encodings
+def decode_string(content):
+    encoding_types = ['utf-8', 'ascii', 'latin-1']  # list of possible encodings
+    for encoding in encoding_types:
+        try:
+            decoded_text = content.decode(encoding)
+            print(f"Successfully decoded using {encoding}")
+            return decoded_text
+        except UnicodeDecodeError:
+            print(f"Failed to decode using {encoding}")
+            continue
+    return ""
+
+
 # Strip a mail to make it shorter
 def process_mail(mail):
-    skip_after = "________________________________"
+    skip_after = "Von:"
     content = mail['content']
     # remove everything after skip_after
     content = content.split(skip_after)[0]
-    # remove escaped line breaks
-    content = content.replace("\r\n", "")
 
-    query = f"On {mail['date']}, {mail['sender']} wrote:"
+    query = f"On {mail['date']}, {mail['sender']} wrote: "
     query += content + "\n\n"
 
     return query
