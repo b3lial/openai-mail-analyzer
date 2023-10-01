@@ -61,6 +61,10 @@ def main():
         openai_query += process_mail(email)
         openai_query += "\n\n"
     
+    # ask user for input and read from stdin
+    print("Please enter your query:")
+    user_query = input()
+
     # send query to openAI 
     openai.api_key = openai_token
     response = openai.ChatCompletion.create(
@@ -68,7 +72,7 @@ def main():
         messages=[
                 {
                     "role": "user",
-                    'content': f'Dies ist ein Email-Verkauf. Fasse ihn zusammen: \n\n {openai_query}'
+                    'content': f'Dies ist ein Email-Verkauf. {user_query}: \n\n {openai_query}'
                 }
         ]
     )
