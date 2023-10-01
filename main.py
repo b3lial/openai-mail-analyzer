@@ -4,6 +4,7 @@ import imaplib
 import email
 from datetime import datetime
 import openai
+import re
 
 #mail_subject = "Update zum neuen Büro Interior"
 mail_subject = "Update zum neuen"
@@ -53,21 +54,29 @@ def main():
     mail.logout()
 
     # process mails
-    openai_query = process_mails(emails)
-    openai_query += "\n\nSummarize the mail thread:\n\n"
+    for email in emails:
+        openai_query = process_mail(email)
+        openai_query += "\n\nSummarize the mail:\n\n"
     
-    # send query to openAI and ask for a summary
-    openai.api_key = openai_token
-    # Sending the entire conversation as the prompt
-    response = openai.Completion.create(
-        engine="davinci",
-        prompt=openai_query,
-        temperature=0.8,
-        max_tokens=150
-    )
+        # send query to openAI and ask for a summary
+        openai.api_key = openai_token
+        # Sending the entire conversation as the prompt
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    f"content": "[{openai_query}]"
+                },
+                {
+                    "role": "user",
+                    "content": "Summarize the mail."
+                }
+            ]
+        )
 
-    # Output the AI's response
-    print(response.choices[0].text.strip())
+        # Output the AI's response
+        print(response.choices[0].text.strip())
 
 # parse emails to get sender, content, etc and return result as list
 def parse_mails(mail, email_ids):
@@ -116,14 +125,20 @@ def parse_mails(mail, email_ids):
             'content': content_str,
         })
 
-        return emails
+    return emails
 
-# concats the emails content and sender to a string which can be sent to open AI
-def process_mails(emails):
-    query = "here comes a mail thread (each new mail begins with \"On ... wrote:\"):\n\n"
-    for mail in emails:
-        query += f"On {mail['date']}, {mail['sender']} wrote:"
-        query += mail['content'] + "\n\n"
+# Strip a mail to make it shorter
+def process_mail(mail):
+    skip_after = "________________________________"
+    content = mail['content']
+    # remove everything after skip_after
+    content = content.split(skip_after)[0]
+    # remove escaped line breaks
+    content = content.replace("\r\n", "")
+
+    query = f"On {mail['date']}, {mail['sender']} wrote:"
+    query += content + "\n\n"
+
     return query
 
 def check_login(username, password, server):
