@@ -54,25 +54,27 @@ def main():
     mail.logout()
 
     # process mails
+    openai_query = ""
     for email in emails:
-        openai_query = process_mail(email)
+        openai_query += process_mail(email)
+        openai_query += "\n\n"
     
-        # send query to openAI and ask for a summary
-        openai.api_key = openai_token
-        # Sending the entire conversation as the prompt
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
+    # send query to openAI and ask for a summary
+    openai.api_key = openai_token
+    # Sending the entire conversation as the prompt
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
                 {
                     "role": "user",
-                    'content': f'Dies ist eine Email. Fasse sie kurz zusammen: \n\n {openai_query}'
+                    'content': f'Dies ist ein Email-Verkauf. Fasse ihn zusammen: \n\n {openai_query}'
                 }
-            ]
-        )
+        ]
+    )
 
-        # Output the AI's response
-        print("\n\n---------------\n")
-        print(response["choices"][0]["message"]["content"])
+    # Output the AI's response
+    print("\n\n---------------")
+    print(response["choices"][0]["message"]["content"])
 
 # parse emails to get sender, content, etc and return result as list
 def parse_mails(mail, email_ids):
