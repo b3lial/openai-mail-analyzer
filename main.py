@@ -56,7 +56,6 @@ def main():
     # process mails
     for email in emails:
         openai_query = process_mail(email)
-        openai_query += "\n\nSummarize the mail:\n\n"
     
         # send query to openAI and ask for a summary
         openai.api_key = openai_token
@@ -76,9 +75,10 @@ def main():
         )
 
         # Output the AI's response
-        print("mail summary:")
+        print("\n\n---------------\n")
+        print("openai response: " + response["choices"][0]["finish_reason"])
         print(response["choices"][0]["message"]["content"])
-        print("---------------\n\n") 
+        print("---------------") 
 
 # parse emails to get sender, content, etc and return result as list
 def parse_mails(mail, email_ids):
