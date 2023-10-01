@@ -120,11 +120,7 @@ def parse_mails(mail, email_ids):
                     break
         else:
             # If not multipart, directly get the payload
-            content = message.get_payload(decode=True)
-            try:
-                content_str = content.decode('utf-8')
-            except UnicodeDecodeError:
-                content_str = ""
+            content_str = decode_string(message.get_payload(decode=True))
 
         # Append to the emails list
         emails.append({
