@@ -64,21 +64,15 @@ def main():
             model="gpt-3.5-turbo",
             messages=[
                 {
-                    "role": "system",
-                    "content": "This is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly."
-                },
-                {
                     "role": "user",
-                    'content': f'Summarize this mail: \n\n {openai_query}'
+                    'content': f'Dies ist eine Email. Fasse sie kurz zusammen: \n\n {openai_query}'
                 }
             ]
         )
 
         # Output the AI's response
         print("\n\n---------------\n")
-        print("openai response: " + response["choices"][0]["finish_reason"])
         print(response["choices"][0]["message"]["content"])
-        print("---------------") 
 
 # parse emails to get sender, content, etc and return result as list
 def parse_mails(mail, email_ids):
@@ -147,7 +141,7 @@ def process_mail(mail):
     # remove everything after skip_after
     content = content.split(skip_after)[0]
 
-    query = f"On {mail['date']}, {mail['sender']} wrote: "
+    query = f"Am {mail['date']}, schrieb {mail['sender']}: "
     query += content + "\n\n"
 
     return query
