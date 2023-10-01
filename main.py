@@ -54,7 +54,20 @@ def main():
 
     # process mails
     openai_query = process_mails(emails)
-    print(openai_query)
+    openai_query += "\n\nSummarize the mail thread:\n\n"
+    
+    # send query to openAI and ask for a summary
+    openai.api_key = openai_token
+    # Sending the entire conversation as the prompt
+    response = openai.Completion.create(
+        engine="davinci",
+        prompt=openai_query,
+        temperature=0.8,
+        max_tokens=150
+    )
+
+    # Output the AI's response
+    print(response.choices[0].text.strip())
 
 # parse emails to get sender, content, etc and return result as list
 def parse_mails(mail, email_ids):
