@@ -9,8 +9,6 @@ import logging
 # set logging level
 logging.basicConfig(level=logging.WARNING)
 
-mail_subject = "Update zum neuen"
-
 # this programs reads amail threads and lets them analyse by openAI
 def main():
     # load secrets from .env file
@@ -37,6 +35,11 @@ def main():
     # select inbox
     mail.select("INBOX")
 
+    # ask user for email subject
+    print("What is the subject of the email thread?")
+    #mail_subject = "Update zum neuen"
+    mail_subject = input()
+
     # search for mails
     status, email_ids = mail.search(None, f'(SUBJECT "{mail_subject}")')
     email_ids = email_ids[0].split()
@@ -60,9 +63,9 @@ def main():
     for email in emails:
         openai_query += process_mail(email)
         openai_query += "\n\n"
-    
+
     # ask user for input and read from stdin
-    print("Please enter your query:")
+    print("What do you want to know?")
     user_query = input()
 
     # send query to openAI 
@@ -93,6 +96,7 @@ def parse_mails(mail, email_ids):
 
         # Extract email date, subject, sender, and content
         date = message.get('date')
+        date = date.replace(' (UTC)', '')
         date_parsed = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %z')
         subject = message.get('subject')
         sender = message.get('from')
@@ -143,10 +147,19 @@ def decode_string(content):
 
 # Strip a mail to make it shorter
 def process_mail(mail):
-    skip_after = "Von:"
     content = mail['content']
+    
     # remove everything after skip_after
+    skip_after = "Von:"
     content = content.split(skip_after)[0]
+
+    # search for first line which starts with > and remove everything after and first 3 lines above
+    lines = content.splitlines()
+    for i, line in enumerate(lines):
+        if line.startswith(">"):
+            lines = lines[:i-3]
+            break
+    content = "\n".join(lines)
 
     query = f"Am {mail['date']}, schrieb {mail['sender']}: "
     query += content + "\n\n"
