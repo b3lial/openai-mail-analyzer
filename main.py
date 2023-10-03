@@ -7,7 +7,7 @@ import openai
 import logging
 
 # set logging level
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(filename='analyzer.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # this programs reads amail threads and lets them analyse by openAI
 def main():
@@ -48,12 +48,12 @@ def main():
 
     # parse mails
     emails = parse_mails(mail, email_ids)
-    # emails.sort(key=lambda email: email['date'])
+    emails.sort(key=lambda email: email['date'])
 
     # Now, emails are sorted by date in ascending order.
     # You can access the email data like this:
     for email_data in emails:
-        print(f"Email ID: {email_data['email_id']}, Date: {email_data['date']}, From: {email_data['sender']}")
+        logging.info(f"Email ID: {email_data['email_id']}, Date: {email_data['date']}, From: {email_data['sender']}")
 
     # close connection
     mail.close()
@@ -166,6 +166,7 @@ def process_mail(mail):
 
     query = f"Am {mail['date']}, schrieb {mail['sender']}: "
     query += content + "\n\n"
+    logging.info(f'Process mail result: {query}')
 
     return query
 
