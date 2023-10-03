@@ -33,7 +33,7 @@ def main():
             logging.info(mailbox)
 
     # select inbox
-    mail.select("INBOX")
+    mail.select("INBOX", readonly=True)
 
     # ask user for email subject
     print("What is the subject of the email thread?")
@@ -41,8 +41,9 @@ def main():
     mail_subject = input()
 
     # search for mails
-    status, email_ids = mail.search(None, f'(SUBJECT "{mail_subject}")')
-    email_ids = email_ids[0].split()
+    mail.literal  = mail_subject.encode('utf-8')
+    status, email_ids = mail.uid('SEARCH', 'CHARSET', 'UTF-8', 'SUBJECT')
+    email_ids = email_ids[0].decode('utf-8').split()
     print(f"Found {len(email_ids)} emails with subject '{mail_subject}'")
 
     # parse mails
@@ -90,7 +91,7 @@ def parse_mails(mail, email_ids):
 
     # Fetch each email's data
     for e_id in email_ids:
-        status, email_data = mail.fetch(e_id, '(RFC822)')
+        status, email_data = mail.uid('fetch', e_id, '(RFC822)')
         raw_email = email_data[0][1]
         message = email.message_from_bytes(raw_email)
 
