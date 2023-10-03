@@ -12,12 +12,13 @@ logging.basicConfig(filename='analyzer.log', level=logging.INFO, format='%(ascti
 
 # this programs reads amail threads and lets them analyse by openAI
 def main():
-    # load secrets from .env file
+    # load secrets from .env file and initialize openAI
     load_dotenv()
     secret = os.environ.get('MAIL_PASSWORD')
     user = os.environ.get('MAIL_USER')
     server = os.environ.get('MAIL_SERVER')
     openai_token = os.environ.get('OPENAI_TOKEN')
+    openai.api_key = openai_token
     logging.info(f'User: {user}')
     logging.info(f'Server: {server}')
 
@@ -46,6 +47,8 @@ def main():
     status, email_ids = mail.uid('SEARCH', 'CHARSET', 'UTF-8', 'SUBJECT')
     email_ids = email_ids[0].decode('utf-8').split()
     print(f"Found {len(email_ids)} emails with subject '{mail_subject}'")
+    if len(email_ids) == 0:
+        return
 
     # parse mails
     emails = parse_mails(mail, email_ids)
@@ -71,13 +74,12 @@ def main():
     user_query = input()
 
     # send query to openAI 
-    openai.api_key = openai_token
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
                 {
                     "role": "user",
-                    'content': f'Dies ist ein Email-Verkauf. {user_query}: \n\n {openai_query}'
+                    'content': f'Dies ist ein Email-Verlauf. {user_query}. {openai_query} \n\n'
                 }
         ]
     )
