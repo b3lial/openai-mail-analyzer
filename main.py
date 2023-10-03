@@ -5,6 +5,7 @@ import email
 from datetime import datetime
 import openai
 import logging
+from dateutil import parser
 
 # set logging level
 logging.basicConfig(filename='analyzer.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -97,11 +98,9 @@ def parse_mails(mail, email_ids):
 
         # Extract email date, subject, sender, and content
         date = message.get('date')
-        date = date.replace(' (UTC)', '')
-        date = date.replace(' (CEST)', '')
         date_parsed = None
         try:
-            date_parsed = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %z')
+            date_parsed = parser.parse(date)
         except ValueError:
             logging.error(f"Failed to parse date {date}")
             date_parsed = ''
