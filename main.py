@@ -79,7 +79,7 @@ def main():
         messages=[
                 {
                     "role": "system",
-                    'content': f'You are an office assistant who just read this mail thread answers questions regarding its content: \n\n {openai_query}'
+                    'content': f'You are an office assistant who just read this mail thread and answers questions regarding its content: \n\n {openai_query}'
                 },
                 {
                     "role": "user",
