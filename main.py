@@ -78,8 +78,12 @@ def main():
         model="gpt-3.5-turbo",
         messages=[
                 {
+                    "role": "system",
+                    'content': f'You are an office assistant who just read this mail thread answers questions regarding its content: \n\n {openai_query}'
+                },
+                {
                     "role": "user",
-                    'content': f'Dies ist ein Email-Verlauf. {user_query}. {openai_query} \n\n'
+                    'content': f'{user_query}'
                 }
         ]
     )
