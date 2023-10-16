@@ -11,7 +11,7 @@ OPENAI_TOKEN=<your chatgpt token>
 ```
 
 ## Usage
-Run `python main.py`. FInally, the tool asks for the topic of a mail thread and your question. Example:
+Run `python main.py`. Finally, the tool asks for the topic of a mail thread and your question. Example:
 ```
 16:01 $ python main.py 
 What is the subject of the email thread?
